@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.iutils.plug.dict.dao.DictDao">
+
+    <sql id="DictColumns">
+        a.id as "id",
+        a.value as "value",
+        a.label as "label",
+        a.type as "type",
+        a.sort as "sort",
+        a.create_by as "createBy",
+        a.create_date as "createDate",
+        a.update_by as "updateBy",
+        a.update_date as "updateDate",
+        a.remarks as "remarks",
+        a.status as "status"
+    </sql>
+
+    <sql id="DictJoins">
+
+    </sql>
+
+    <select id="get" resultType="cn.iutils.plug.dict.entity.Dict">
+        SELECT
+        <include refid="DictColumns"/>
+        FROM sys_dict a
+        WHERE a.id = #{id}
+    </select>
+
+    <select id="findList" resultType="cn.iutils.plug.dict.entity.Dict">
+        SELECT
+        <include refid="DictColumns"/>
+        FROM sys_dict a
+        <where>
+            <if test="type != null and type != ''">
+                and a.type = #{type}
+            </if>
+        </where>
+        ORDER BY a.sort ASC
+    </select>
+
+    <select id="count" resultType="int">
+        SELECT count(1) FROM sys_dict a
+        <where>
+            <if test="page.entity.type!=null and page.entity.type!=''">
+                and a.type like
+                <if test="page.entity.dbType == 'oracle'">'%'||#{page.entity.type}||'%')</if>
+                <if test="page.entity.dbType == 'mssql'">'%'+#{page.entity.type}+'%')</if>
+                <if test="page.entity.dbType == 'mysql'">CONCAT('%',#{page.entity.type},'%')</if>
+            </if>
+        </where>
+    </select>
+
+    <select id="findPage" resultType="cn.iutils.plug.dict.entity.Dict">
+        SELECT <include refid="DictColumns"/> FROM sys_dict a
+        <where>
+            <if test="page.entity.type!=null and page.entity.type!=''">
+                and a.type like
+                <if test="page.entity.dbType == 'oracle'">'%'||#{page.entity.type}||'%')</if>
+                <if test="page.entity.dbType == 'mssql'">'%'+#{page.entity.type}+'%')</if>
+                <if test="page.entity.dbType == 'mysql'">CONCAT('%',#{page.entity.type},'%')</if>
+            </if>
+        </where>
+        <if test="page.orderBy!=''">
+            ORDER BY a.sort ASC,${page.orderBy} LIMIT ${page.pageNo*page.pageSize},${page.pageSize}
+        </if>
+    </select>
+
+    <insert id="insert">
+        insert into sys_dict(
+                value,
+                label,
+                type,
+                sort,
+                create_by,
+                create_date,
+                update_by,
+                update_date,
+                remarks,
+                status
+        )
+        values(
+                #{value},
+                #{label},
+                #{type},
+                #{sort},
+                #{createBy},
+                #{createDate},
+                #{updateBy},
+                #{updateDate},
+                #{remarks},
+                #{status}
+        )
+    </insert>
+
+    <update id="update">
+        update sys_dict set
+                value=#{value},
+                label=#{label},
+                type=#{type},
+                sort=#{sort},
+                create_by=#{createBy},
+                create_date=#{createDate},
+                update_by=#{updateBy},
+                update_date=#{updateDate},
+                remarks=#{remarks},
+                status=#{status}
+        where id=#{id}
+    </update>
+
+    <delete id="delete">
+        delete from sys_dict where id=#{id}
+    </delete>
+</mapper>
